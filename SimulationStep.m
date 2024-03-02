@@ -1,6 +1,6 @@
 function [xnew ,vnew] = SimulationStep (dt,x,v,ball,box,g)
 %SimulationStep will run one timestep of the simulation
-    global D 
+    global D G
     persistent NPx  NPy Xb Yb CompletedCells
     Forces = zeros(2,length(x));
     Forces2 = zeros(2,length(x));
@@ -43,76 +43,9 @@ function [xnew ,vnew] = SimulationStep (dt,x,v,ball,box,g)
     if(D)
         for i = 1:G
             for j = 1:G
-                %if CompletedCells(i,j) == 0
-                    % Find Particles in Box i,j
-                    C = NPx{i}(ismember(NPx{i},NPy{j}));
-                    %if (~isempty(C) && length(C) > 1)      
-                        % Check Collisions with Particles in the same box
-                        % Centre Check
-                        Forces = collisionsInCell(ball.spring,ball.radius,x,C,Forces);  
-                        %CompletedCells(i,j) = 1;
-
-                        
-                        % North Check
-                        if (j<G)
-                           C = NPx{i}(ismember(NPx{i},NPy{j+1}));
-                           Forces = collisionsInCell(ball.spring,ball.radius,x,C,Forces); 
-                           %CompletedCells(i,j+1) = 1;
-                        end
-%                         % South Check
-%                         if (j>1)
-%                            C = NPx{i}(ismember(NPx{i},NPy{j-1}));
-%                            Forces = collisionsInCell(ball.spring,ball.radius,x,C,Forces); 
-%                            %CompletedCells(i,j-1) = 1;
-%                         end
-%                         % East Check
-%                         if (i<G)
-%                            C = NPx{i+1}(ismember(NPx{i+1},NPy{j}));
-%                            Forces = collisionsInCell(ball.spring,ball.radius,x,C,Forces); 
-%                            %CompletedCells(i+1,j) = 1;
-%                         end
-%                         % West Check
-%                         if (1<i)
-%                            C = NPx{i-1}(ismember(NPx{i-1},NPy{j}));
-%                            Forces = collisionsInCell(ball.spring,ball.radius,x,C,Forces); 
-%                            %CompletedCells(i-1,j) = 1;
-%                         end
-% 
-% 
-% 
-%                         % North East Check
-%                         if (i < G && j < G)
-%                            C = NPx{i+1}(ismember(NPx{i+1},NPy{j+1}));
-%                            Forces = collisionsInCell(ball.spring,ball.radius,x,C,Forces); 
-%                            %CompletedCells(i-1,j) = 1;
-%                         end
-% 
-% 
-%                         % South East Check
-%                         if (i < G && j > 1)
-%                            C = NPx{i+1}(ismember(NPx{i+1},NPy{j-1}));
-%                            Forces = collisionsInCell(ball.spring,ball.radius,x,C,Forces); 
-%                            %CompletedCells(i-1,j) = 1;
-%                         end
-%                         
-%                         % South West Check
-%                         if (1 < i && 1 < j)
-%                            C = NPx{i-1}(ismember(NPx{i-1},NPy{j-1}));
-%                            Forces = collisionsInCell(ball.spring,ball.radius,x,C,Forces); 
-%                            %CompletedCells(i-1,j) = 1;
-%                         end
-%                         
-%                         % North West Check
-%                         if (1 < i && j < G)
-%                            C = NPx{i-1}(ismember(NPx{i-1},NPy{j+1}));
-%                            Forces = collisionsInCell(ball.spring,ball.radius,x,C,Forces); 
-%                            %CompletedCells(i-1,j) = 1;
-%                         end
-
-
-
-                    %end
-                %end
+                C = NPx{i}(ismember(NPx{i},NPy{j}));
+                
+                Forces = collisionsInCell(ball.spring,ball.radius,x,C,Forces);  
             end
         end
     end
@@ -134,7 +67,7 @@ function [xnew ,vnew] = SimulationStep (dt,x,v,ball,box,g)
     LABAL = norm(Forces - Forces2);
     VALAL = norm(vnew - vnew2);
 
-    disp(Forces ~= Forces2)
+    
 
 end
 

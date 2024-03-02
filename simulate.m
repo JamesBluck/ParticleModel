@@ -1,4 +1,4 @@
-function [] = simulate(N,g, t_ini, t_end,D_in,G_in)
+function [] = simulate(N,g, t_ini, t_end,D_in)
 %Simulate will set up and run the particle model for a given set of
 %parameters and initial conditions:
 % N - 4^p | number of particles (using a power of 4)
@@ -9,7 +9,7 @@ ball.spring = 250; % spring constant for particles ball.spring;
 ball.radius = 0.2; % radius in which particle exerts force ball.radius;
 dt = 0.01; % time step size in updating formula;
 l = [0;0]; % lower-left corner of box containing particles, first column of input box in SimulationStep;
-u = [5;5].*sqrt(N); %  initial upper-right corner of box
+u = [10;10].*sqrt(N); %  initial upper-right corner of box
 
 
 
@@ -24,8 +24,8 @@ t = t_ini:dt:t_end;
 
 
 % Use Grid Discretisation to Reduce Complexity?
-global G D 
-G = G_in; D = D_in;
+global G D;
+G = ceil((t_end - t_ini)/ball.radius); D = D_in;
 
 
 
