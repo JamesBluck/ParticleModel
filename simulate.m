@@ -14,7 +14,7 @@ ball.spring = 250; % spring constant for particles ball.spring;
 ball.radius = 0.2; % radius in which particle exerts force ball.radius;
 dt = 0.01; % time step size in updating formula;
 l = [0;0]; % lower-left corner of box containing particles, first column of input box in SimulationStep;
-u = [5;5].*sqrt(N); %  initial upper-right corner of box
+u = [10;10].*sqrt(N); %  initial upper-right corner of box
 
 
 
@@ -45,7 +45,7 @@ Plot.SizeData = 20;
 
 set(gca,"NextPlot","replacechildren")
 vid = VideoWriter("Animation","MPEG-4");
-open(vid)
+open(vid);
 
 i=0;
 % Simulation
@@ -56,9 +56,9 @@ for tn = t
         Plot.YData = x(2,:);
         xlim([l(1)-0.4 u(1)+0.4]);
         ylim([l(2)-0.4 u(2)+0.4]);
-        drawnow 
+        drawnow;
         writeVideo(vid, getframe(gcf));
-        disp(['Time Elapsed: ', string(t),'s'])
+        fprintf('Time Elapsed: %2.3f\n', string(tn))
     %end
     i = i+1;
 end
