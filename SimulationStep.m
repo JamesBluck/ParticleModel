@@ -22,15 +22,15 @@ function [xnew ,vnew] = SimulationStep (dt,x,v,ball,box,g,t)
     % For every Particle 
     for i = 1:length(x)
         p1 = x(:,i); 
-        if(D)
+        if(~D)
             for j = 1:length(x)
                 % DO I NEED TO PREVENT DOUBLE CHECK? ASK JAN SIEBER
                 if i ~= j && CompletedPairs2(i,j)==0
                     p2 = x(:,j);
                     % Calculating Forces from Particle Collision                    
                     Fp = particleCollisionForces(ball.spring,ball.radius,p1,p2);
-                    Forces2(:,i) = Forces2(:,i) + Fp;
-                    Forces2(:,j) = Forces2(:,j) - Fp;
+                    Forces(:,i) = Forces(:,i) + Fp;
+                    Forces(:,j) = Forces(:,j) - Fp;
                      if all(Fp)
                          CompletedPairs2(i,j) = 1;
                          CompletedPairs2(j,i) = 1;
@@ -53,14 +53,14 @@ function [xnew ,vnew] = SimulationStep (dt,x,v,ball,box,g,t)
 
 
     if(D)
-        populatedCells = cat(1,grid{~cellfun('isempty',grid)});
-        for i = 1:length(grid)
-            if(~isempty(grid{i}))
+        populatedCells = find(~cellfun('isempty',grid))';
+        for i = populatedCells
+            %if(populatedCells)
                 for j = 1:length(grid{i})
                     % Center
-                    %if(length(grid{i}) > 1)
+                    if(length(grid{i}) > 1)
                         [Forces,CompletedPairs] = checkParticleCellCollisions(ball.spring,ball.radius,x,Forces,CompletedPairs,grid{i}(j),grid{i}); 
-                    %end
+                    end
                     
                     % North South
                     if(i+1 <= length(grid))
@@ -110,7 +110,7 @@ function [xnew ,vnew] = SimulationStep (dt,x,v,ball,box,g,t)
 
 
                 end
-            end
+            %end
         end
     end
     % Including Gravity
@@ -124,7 +124,7 @@ function [xnew ,vnew] = SimulationStep (dt,x,v,ball,box,g,t)
     vnew =(xnew - x)./dt;
  
 %     PALAL = norm(xnew - xnew2);
-     LABAL = norm(Forces - Forces2);
+     %LABAL = norm(Forces - Forces2);
 %     VALAL = norm(vnew - vnew2);
 
     
