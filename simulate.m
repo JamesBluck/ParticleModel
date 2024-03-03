@@ -43,7 +43,7 @@ i=0;
 % Simulation
 for tn = t
     %tn
-    [x, v] = SimulationStep(dt, x, v, ball, [l u], g,tn);
+    [x, v] = SimulationStep(dt, x, v, ball, [l u], g);
    
 
     if(mod(i,30)==0)

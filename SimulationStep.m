@@ -1,4 +1,4 @@
-function [xnew ,vnew] = SimulationStep (dt,x,v,ball,box,g,t)
+function [xnew ,vnew] = SimulationStep (dt,x,v,ball,box,g)
 %SimulationStep will run one timestep of the simulation
     global D  
     Forces = zeros(2,length(x));
