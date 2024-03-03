@@ -16,7 +16,7 @@ u = [10;10].*sqrt(N); %  initial upper-right corner of box
 % Initial Positions and approximate speed of particles 
 rng(2024);
 x=[l(1)+rand(1,N)*(u(1)-l(1)); l(2)+rand(1,N)*(u(2)-l(2))];
-vini = 3.5;
+vini = 7.5;
 v=2*(rand(2,N)-0.5)*vini;
 
 % Discretising time
@@ -24,10 +24,11 @@ t = t_ini:dt:t_end;
 
 
 % Use Grid Discretisation to Reduce Complexity?
-global G D;
+global D;
 D = D_in;
 
-
+global prev;
+prev = 0;
 
 
 
@@ -37,8 +38,10 @@ hold on;
 axis manual;
 
 Plot = scatter(x(1,:),x(2,:),"filled");
-
 Plot.SizeData = 20;
+
+
+
 i=0;
 % Simulation
 for tn = t
@@ -46,16 +49,15 @@ for tn = t
     [x, v] = SimulationStep(dt, x, v, ball, [l u], g);
    
     % New Comment
-    if(mod(i,30)==0)
+    if(mod(i,1)==0)
         Plot.XData = x(1,:);
         Plot.YData = x(2,:);
         xlim([l(1)-0.4 u(1)+0.4]);
         ylim([l(2)-0.4 u(2)+0.4]);
         drawnow 
+        pause(0.005)
     end
     i = i+1;
 end
-
-
 end
 
