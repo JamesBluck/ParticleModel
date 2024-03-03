@@ -43,9 +43,9 @@ i=0;
 % Simulation
 for tn = t
     %tn
-    [x, v] = SimulationStep(dt, x, v, ball, [l u], g,tn);
+    [x, v] = SimulationStep(dt, x, v, ball, [l u], g);
    
-
+    % New Comment
     if(mod(i,30)==0)
         Plot.XData = x(1,:);
         Plot.YData = x(2,:);
