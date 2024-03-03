@@ -5,8 +5,10 @@ theta = atan2(p1(2) - p2(2),p1(1) - p2(1)); % Angle Between Particles
 
 if (0 < d) && (d < 2*r)
    F =  K*(2*r - d).*[cos(theta); sin(theta)];
-
-   plot(p1(1,1),p1(2,1),'o')
+    if all(F)
+        plot(p1(1,1),p1(2,1),'o')
+    end
+   %
 
 else
    F = 0;

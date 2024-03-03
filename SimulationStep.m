@@ -1,55 +1,95 @@
-function [xnew ,vnew] = SimulationStep (dt,x,v,ball,box,g)
+function [xnew ,vnew] = SimulationStep (dt,x,v,ball,box,g,t)
 %SimulationStep will run one timestep of the simulation
-    global D G
-    persistent NPx  NPy Xb Yb CompletedCells
+    global D G CompletedPairs CompletedPairs2
     Forces = zeros(2,length(x));
     Forces2 = zeros(2,length(x));
-    % Find Closest Grid Points of Particles 
-    NPx = cell(1,G);
-    NPy = cell(1,G);
-    Xb = discretize(x(1,:),G);
-    Yb = discretize(x(2,:),G);
+    
+    CompletedPairs = zeros(length(x));
+    CompletedPairs2 = zeros(length(x));
 
+    if(D)
+        grid_idx = floor(abs(x./(4*ball.radius)));
+    
+        num_cells_x = 1 + (box(1,2) - box(1,1))/(4*ball.radius);
+    
+        cell_indices = sub2ind([num_cells_x, num_cells_x], grid_idx(1,:)+1, grid_idx(2,:) + 1);
+        cell_indices = cell_indices(:);
+        particle_indices = (1:length(x))';
+    
+        grid = accumarray(cell_indices, particle_indices, [], @(x) {x});
+    end
 
     % For every Particle 
     for i = 1:length(x)
-        % Calculating Forces from Wall Collision
-        p1 = x(:,i);  
-        Forces(:,i) = Forces(:,i) + wallForces(ball.spring,ball.radius,box,p1);
-        Forces2(:,i) = Forces2(:,i) + wallForces(ball.spring,ball.radius,box,p1);
-        % Storing Indexes of particles in same 'discretised bin'
-        NPx{Xb(i)} = [NPx{Xb(i)} i];
-        NPy{Yb(i)} = [NPy{Yb(i)} i];
-    
-        if(D)
+        p1 = x(:,i); 
+        if(~D)
             for j = 1:length(x)
-                if i ~= j
+                if i ~= j %&& CompletedPairs2(i,j)==0
                     p2 = x(:,j);
-                    % Calculating Forces from Particle Collision
-                    
-            
+                    % Calculating Forces from Particle Collision                    
                     Fp = particleCollisionForces(ball.spring,ball.radius,p1,p2);
-                    Forces2(:,i) = Forces2(:,i) + Fp;
-                    Forces2(:,j) = Forces2(:,j) - Fp;
+                    Forces(:,i) = Forces(:,i) + Fp;
+                    Forces(:,j) = Forces(:,j) - Fp;
+%                     if all(Fp)
+%                         CompletedPairs2(i,j) = 1;
+%                         CompletedPairs2(j,i) = 1;
+%                         %disp(['Completed2: ',string(i),string(j)])
+%                     end
+                end
+            end
+        end
+     
+
+
+
+        % Calculating Forces from Wall Collision
+         
+        Forces(:,i) = Forces(:,i) + wallForces(ball.spring,ball.radius,box,p1);
+        %Forces2(:,i) = Forces2(:,i) + wallForces(ball.spring,ball.radius,box,p1); 
+    end
+    
+
+    if(D)
+        for i = 1:length(grid)
+            if(~isempty(grid{i}))
+                for j = 1:length(grid{i})
+                    % Center
+                    Forces = checkParticleCellCollisions(ball.spring,ball.radius,x,Forces,grid{i}(j),grid{i}); 
+
+                    % North South
+                    if(i+1 <= length(grid))
+                        Forces = checkParticleCellCollisions(ball.spring,ball.radius,x,Forces,grid{i}(j),grid{i+1}); 
+                    end
+                    if(i-1 >= 1)
+                        Forces = checkParticleCellCollisions(ball.spring,ball.radius,x,Forces,grid{i}(j),grid{i-1}); 
+                    end
+                    % East West
+                    if(i+num_cells_x < length(grid))
+                        Forces = checkParticleCellCollisions(ball.spring,ball.radius,x,Forces,grid{i}(j),grid{i+num_cells_x}); 
+                    end
+                    if(i-num_cells_x >= 1)
+                        Forces = checkParticleCellCollisions(ball.spring,ball.radius,x,Forces,grid{i}(j),grid{i-num_cells_x}); 
+                    end
+                    % NE SE
+                    if(i+num_cells_x+1 < length(grid))
+                        Forces = checkParticleCellCollisions(ball.spring,ball.radius,x,Forces,grid{i}(j),grid{i+num_cells_x+1}); 
+                    end
+                    if(i+num_cells_x-1 < length(grid))
+                        Forces = checkParticleCellCollisions(ball.spring,ball.radius,x,Forces,grid{i}(j),grid{i+num_cells_x-1}); 
+                    end
+                    % NW SW
+                    if(i-num_cells_x+1 >= 1)
+                        Forces = checkParticleCellCollisions(ball.spring,ball.radius,x,Forces,grid{i}(j),grid{i-num_cells_x+1}); 
+                    end
+                    if(i-num_cells_x-1 >= 1)
+                        Forces = checkParticleCellCollisions(ball.spring,ball.radius,x,Forces,grid{i}(j),grid{i-num_cells_x-1}); 
+                    end
+
+
                 end
             end
         end
     end
-    
-    % Optimising Calculation of Particle Collisions by considering only
-    % particles within the same discretised grid box. 
-
-    %CompletedCells = zeros(G);
-    if(D)
-        for i = 1:G
-            for j = 1:G
-                C = NPx{i}(ismember(NPx{i},NPy{j}));
-                
-                Forces = collisionsInCell(ball.spring,ball.radius,x,C,Forces);  
-            end
-        end
-    end
-    
     % Including Gravity
     Forces = Forces + [0; -g];
 
@@ -59,13 +99,10 @@ function [xnew ,vnew] = SimulationStep (dt,x,v,ball,box,g)
     % Updating Position and Velocity Vectors via Verlet 
     xnew =x+ dt.*v + dt^2.*Forces ; % mass is equal 1 !
     vnew =(xnew - x)./dt;
-    
-    xnew2 =x+ dt.*v + dt^2.*Forces2 ; % mass is equal 1 !
-    vnew2 =(xnew - x)./dt;
-
-    PALAL = norm(xnew - xnew2);
-    LABAL = norm(Forces - Forces2);
-    VALAL = norm(vnew - vnew2);
+ 
+%     PALAL = norm(xnew - xnew2);
+     LABAL = norm(Forces - Forces2);
+%     VALAL = norm(vnew - vnew2);
 
     
 

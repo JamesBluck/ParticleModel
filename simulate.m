@@ -25,7 +25,9 @@ t = t_ini:dt:t_end;
 
 % Use Grid Discretisation to Reduce Complexity?
 global G D;
-G = ceil((t_end - t_ini)/ball.radius); D = D_in;
+G = ceil((u(1) - l(1))/(2*ball.radius)); 
+%G = 8;
+D = D_in;
 
 
 
@@ -41,8 +43,8 @@ Plot = scatter(x(1,:),x(2,:),"filled");
 
 % Simulation
 for tn = t
-    tn
-    [x, v] = SimulationStep(dt, x, v, ball, [l u], g);
+    %tn
+    [x, v] = SimulationStep(dt, x, v, ball, [l u], g,tn);
    
 
     
@@ -51,7 +53,6 @@ for tn = t
     xlim([l(1)-0.4 u(1)+0.4]);
     ylim([l(2)-0.4 u(2)+0.4]);
     drawnow 
-    
 end
 
 
