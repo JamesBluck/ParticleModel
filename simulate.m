@@ -5,18 +5,23 @@ function [] = simulate(N,g, t_ini, t_end,D_in)
 % g - 0 or 0.05 | gravity
 % D_in | Use Grid Optimisation 0 - no, 1 - yes
 
+if isinteger(sqrt(N))
+    error('Number of particles N, must be a power of 4')
+end
+
+
 ball.spring = 250; % spring constant for particles ball.spring;
 ball.radius = 0.2; % radius in which particle exerts force ball.radius;
 dt = 0.01; % time step size in updating formula;
 l = [0;0]; % lower-left corner of box containing particles, first column of input box in SimulationStep;
-u = [10;10].*sqrt(N); %  initial upper-right corner of box
+u = [2;2].*sqrt(N); %  initial upper-right corner of box
 
 
 
 % Initial Positions and approximate speed of particles 
-rng(2024);
+rng(2020);
 x=[l(1)+rand(1,N)*(u(1)-l(1)); l(2)+rand(1,N)*(u(2)-l(2))];
-vini = 7.5;
+vini = 3.5;
 v=2*(rand(2,N)-0.5)*vini;
 
 % Discretising time
@@ -27,8 +32,6 @@ t = t_ini:dt:t_end;
 global D;
 D = D_in;
 
-global prev;
-prev = 0;
 
 
 
@@ -45,17 +48,14 @@ Plot.SizeData = 20;
 i=0;
 % Simulation
 for tn = t
-    %tn
     [x, v] = SimulationStep(dt, x, v, ball, [l u], g);
-   
-    % New Comment
+
     if(mod(i,1)==0)
         Plot.XData = x(1,:);
         Plot.YData = x(2,:);
         xlim([l(1)-0.4 u(1)+0.4]);
         ylim([l(2)-0.4 u(2)+0.4]);
         drawnow 
-        pause(0.005)
     end
     i = i+1;
 end
