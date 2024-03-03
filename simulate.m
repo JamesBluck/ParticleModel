@@ -14,14 +14,14 @@ ball.spring = 250; % spring constant for particles ball.spring;
 ball.radius = 0.2; % radius in which particle exerts force ball.radius;
 dt = 0.01; % time step size in updating formula;
 l = [0;0]; % lower-left corner of box containing particles, first column of input box in SimulationStep;
-u = [2;2].*sqrt(N); %  initial upper-right corner of box
+u = [5;5].*sqrt(N); %  initial upper-right corner of box
 
 
 
 % Initial Positions and approximate speed of particles 
 rng(2020);
 x=[l(1)+rand(1,N)*(u(1)-l(1)); l(2)+rand(1,N)*(u(2)-l(2))];
-vini = 3.5;
+vini = 7.5;
 v=2*(rand(2,N)-0.5)*vini;
 
 % Discretising time
@@ -33,31 +33,35 @@ global D;
 D = D_in;
 
 
-
-
 figure;
 box on;
 hold on;
 axis manual;
 
 Plot = scatter(x(1,:),x(2,:),"filled");
+xlim([l(1)-0.4 u(1)+0.4]);
+ylim([l(2)-0.4 u(2)+0.4]);
 Plot.SizeData = 20;
 
-
+set(gca,"NextPlot","replacechildren")
+vid = VideoWriter("Animation","MPEG-4");
+open(vid)
 
 i=0;
 % Simulation
 for tn = t
     [x, v] = SimulationStep(dt, x, v, ball, [l u], g);
-
-    if(mod(i,1)==0)
+    %if(mod(i,1)==1)
         Plot.XData = x(1,:);
         Plot.YData = x(2,:);
         xlim([l(1)-0.4 u(1)+0.4]);
         ylim([l(2)-0.4 u(2)+0.4]);
         drawnow 
-    end
+        writeVideo(vid, getframe(gcf));
+        disp(['Time Elapsed: ', string(t),'s'])
+    %end
     i = i+1;
 end
+close(vid);
 end
 
