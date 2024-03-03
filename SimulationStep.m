@@ -1,6 +1,6 @@
 function [xnew ,vnew] = SimulationStep (dt,x,v,ball,box,g,t)
 %SimulationStep will run one timestep of the simulation
-    global D G CompletedPairs CompletedPairs2
+    global D  
     Forces = zeros(2,length(x));
     Forces2 = zeros(2,length(x));
     
@@ -22,19 +22,20 @@ function [xnew ,vnew] = SimulationStep (dt,x,v,ball,box,g,t)
     % For every Particle 
     for i = 1:length(x)
         p1 = x(:,i); 
-        if(~D)
+        if(D)
             for j = 1:length(x)
-                if i ~= j %&& CompletedPairs2(i,j)==0
+                % DO I NEED TO PREVENT DOUBLE CHECK? ASK JAN SIEBER
+                if i ~= j && CompletedPairs2(i,j)==0
                     p2 = x(:,j);
                     % Calculating Forces from Particle Collision                    
                     Fp = particleCollisionForces(ball.spring,ball.radius,p1,p2);
-                    Forces(:,i) = Forces(:,i) + Fp;
-                    Forces(:,j) = Forces(:,j) - Fp;
-%                     if all(Fp)
-%                         CompletedPairs2(i,j) = 1;
-%                         CompletedPairs2(j,i) = 1;
+                    Forces2(:,i) = Forces2(:,i) + Fp;
+                    Forces2(:,j) = Forces2(:,j) - Fp;
+                     if all(Fp)
+                         CompletedPairs2(i,j) = 1;
+                         CompletedPairs2(j,i) = 1;
 %                         %disp(['Completed2: ',string(i),string(j)])
-%                     end
+                     end
                 end
             end
         end
@@ -45,44 +46,66 @@ function [xnew ,vnew] = SimulationStep (dt,x,v,ball,box,g,t)
         % Calculating Forces from Wall Collision
          
         Forces(:,i) = Forces(:,i) + wallForces(ball.spring,ball.radius,box,p1);
-        %Forces2(:,i) = Forces2(:,i) + wallForces(ball.spring,ball.radius,box,p1); 
+        Forces2(:,i) = Forces2(:,i) + wallForces(ball.spring,ball.radius,box,p1); 
     end
     
+    
+
 
     if(D)
+        populatedCells = cat(1,grid{~cellfun('isempty',grid)});
         for i = 1:length(grid)
             if(~isempty(grid{i}))
                 for j = 1:length(grid{i})
                     % Center
-                    Forces = checkParticleCellCollisions(ball.spring,ball.radius,x,Forces,grid{i}(j),grid{i}); 
-
+                    %if(length(grid{i}) > 1)
+                        [Forces,CompletedPairs] = checkParticleCellCollisions(ball.spring,ball.radius,x,Forces,CompletedPairs,grid{i}(j),grid{i}); 
+                    %end
+                    
                     % North South
                     if(i+1 <= length(grid))
-                        Forces = checkParticleCellCollisions(ball.spring,ball.radius,x,Forces,grid{i}(j),grid{i+1}); 
+                        if(~isempty(grid{i+1}))
+                            [Forces,CompletedPairs] = checkParticleCellCollisions(ball.spring,ball.radius,x,Forces,CompletedPairs,grid{i}(j),grid{i+1});
+                        end
                     end
                     if(i-1 >= 1)
-                        Forces = checkParticleCellCollisions(ball.spring,ball.radius,x,Forces,grid{i}(j),grid{i-1}); 
+                        if(~isempty(grid{i-1}))
+                            [Forces,CompletedPairs] = checkParticleCellCollisions(ball.spring,ball.radius,x,Forces,CompletedPairs,grid{i}(j),grid{i-1}); 
+                        end
                     end
                     % East West
                     if(i+num_cells_x < length(grid))
-                        Forces = checkParticleCellCollisions(ball.spring,ball.radius,x,Forces,grid{i}(j),grid{i+num_cells_x}); 
+                        if(~isempty(grid{i+num_cells_x}))
+                            [Forces,CompletedPairs] = checkParticleCellCollisions(ball.spring,ball.radius,x,Forces,CompletedPairs,grid{i}(j),grid{i+num_cells_x}); 
+                        end
                     end
                     if(i-num_cells_x >= 1)
-                        Forces = checkParticleCellCollisions(ball.spring,ball.radius,x,Forces,grid{i}(j),grid{i-num_cells_x}); 
+                        if(~isempty(grid{i-num_cells_x}))
+                            [Forces,CompletedPairs] = checkParticleCellCollisions(ball.spring,ball.radius,x,Forces,CompletedPairs,grid{i}(j),grid{i-num_cells_x}); 
+                        end
                     end
                     % NE SE
                     if(i+num_cells_x+1 < length(grid))
-                        Forces = checkParticleCellCollisions(ball.spring,ball.radius,x,Forces,grid{i}(j),grid{i+num_cells_x+1}); 
+                        if(~isempty(grid{i+num_cells_x+1}))
+                            [Forces,CompletedPairs] = checkParticleCellCollisions(ball.spring,ball.radius,x,Forces,CompletedPairs,grid{i}(j),grid{i+num_cells_x+1}); 
+                        end
                     end
+
                     if(i+num_cells_x-1 < length(grid))
-                        Forces = checkParticleCellCollisions(ball.spring,ball.radius,x,Forces,grid{i}(j),grid{i+num_cells_x-1}); 
+                        if(~isempty(grid{i+num_cells_x-1}))
+                            [Forces,CompletedPairs] = checkParticleCellCollisions(ball.spring,ball.radius,x,Forces,CompletedPairs,grid{i}(j),grid{i+num_cells_x-1}); 
+                        end
                     end
                     % NW SW
                     if(i-num_cells_x+1 >= 1)
-                        Forces = checkParticleCellCollisions(ball.spring,ball.radius,x,Forces,grid{i}(j),grid{i-num_cells_x+1}); 
+                        if(~isempty(grid{i-num_cells_x+1}))
+                            [Forces,CompletedPairs] = checkParticleCellCollisions(ball.spring,ball.radius,x,Forces,CompletedPairs,grid{i}(j),grid{i-num_cells_x+1}); 
+                        end 
                     end
                     if(i-num_cells_x-1 >= 1)
-                        Forces = checkParticleCellCollisions(ball.spring,ball.radius,x,Forces,grid{i}(j),grid{i-num_cells_x-1}); 
+                        if(~isempty(grid{i-num_cells_x-1}))
+                            [Forces,CompletedPairs] = checkParticleCellCollisions(ball.spring,ball.radius,x,Forces,CompletedPairs,grid{i}(j),grid{i-num_cells_x-1}); 
+                        end
                     end
 
 

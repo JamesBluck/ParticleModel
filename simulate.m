@@ -9,7 +9,7 @@ ball.spring = 250; % spring constant for particles ball.spring;
 ball.radius = 0.2; % radius in which particle exerts force ball.radius;
 dt = 0.01; % time step size in updating formula;
 l = [0;0]; % lower-left corner of box containing particles, first column of input box in SimulationStep;
-u = [10;10].*sqrt(N); %  initial upper-right corner of box
+u = [5;5].*sqrt(N); %  initial upper-right corner of box
 
 
 
@@ -25,8 +25,6 @@ t = t_ini:dt:t_end;
 
 % Use Grid Discretisation to Reduce Complexity?
 global G D;
-G = ceil((u(1) - l(1))/(2*ball.radius)); 
-%G = 8;
 D = D_in;
 
 
@@ -40,7 +38,7 @@ axis manual;
 
 Plot = scatter(x(1,:),x(2,:),"filled");
 
-
+Plot.SizeData = 20;
 % Simulation
 for tn = t
     %tn
