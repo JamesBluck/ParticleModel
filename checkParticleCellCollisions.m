@@ -1,6 +1,6 @@
 function [Force,CompletedPairs] = checkParticleCellCollisions(ball,x,F,CompletedPairs,p1,Cell)
 for i = 1:length(Cell)
-    if p1~=Cell(i) && CompletedPairs(p1,Cell(i))==0
+    if p1~=Cell(i) %&&% CompletedPairs(p1,Cell(i))==0
         Fp = particleCollisionForces(ball,x(:,p1),x(:,Cell(i)));
         if(all(Fp))
             CompletedPairs(p1,Cell(i))=1;

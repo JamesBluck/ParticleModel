@@ -21,7 +21,7 @@ u = [10;10].*sqrt(N); %  initial upper-right corner of box
 % Initial Positions and approximate speed of particles 
 rng(2020);
 x=[l(1)+rand(1,N)*(u(1)-l(1)); l(2)+rand(1,N)*(u(2)-l(2))];
-vini = 7.5;
+vini = 3.5;
 v=2*(rand(2,N)-0.5)*vini;
 
 % Discretising time
@@ -44,7 +44,8 @@ ylim([l(2)-0.4 u(2)+0.4]);
 Plot.SizeData = 20;
 
 set(gca,"NextPlot","replacechildren")
-vid = VideoWriter("Animation","MPEG-4");
+vid = VideoWriter("Animation","Uncompressed AVI");
+%vid.Quality = 100;
 open(vid);
 
 i=0;

@@ -1,6 +1,5 @@
 function [Forces, CompletedPairs] = processCell(ball,x,Forces,CompletedPairs,Grid,i)
 for j = 1:length(Grid.data{i})
-
     % Consider Particle Collisions of Grid.data{i}(j) with all particles in
     % the current and surrounding cells 
     for k = -1:1
@@ -11,7 +10,6 @@ for j = 1:length(Grid.data{i})
             end
         end
     end
-
 end
 end
 

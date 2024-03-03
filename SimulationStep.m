@@ -40,7 +40,7 @@ function [xnew ,vnew] = SimulationStep (dt,x,v,ball,box,g)
     % Optimised Simulation
     if(D)        
         % Discretise Particles into Boxes
-        Grid = setupGrid(4*ball.radius,2,box,x);
+        Grid = setupGrid(2*ball.radius,3,box,x);
 
 
 
