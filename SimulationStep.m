@@ -49,7 +49,7 @@ function [xnew ,vnew] = SimulationStep (dt,x,v,ball,box,g)
         
         % Calculating Forces from Wall Collision 
         for i = Boundary
-           Forces2(:,i) = Forces2(:,i) + wallForces(ball.spring,ball.radius,box,x(:,i));
+           Forces(:,i) = Forces(:,i) + wallForces(ball.spring,ball.radius,box,x(:,i));
         end
         
         % Converting to linear indexing
