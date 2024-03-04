@@ -21,7 +21,7 @@ u = [10;10].*sqrt(N); %  initial upper-right corner of box
 % Initial Positions and approximate speed of particles 
 rng(202);
 x=[l(1)+rand(1,N)*(u(1)-l(1)); l(2)+rand(1,N)*(u(2)-l(2))];
-vini = 3.5;
+vini = 7.5;
 v=2*(rand(2,N)-0.5)*vini;
 
 % Discretising time
@@ -64,13 +64,11 @@ for tn = t
         xlim([l(1)-0.4 u(1)+0.4]);
         ylim([l(2)-0.4 u(2)+0.4]);
         drawnow;
-         
         %fprintf('Time Elapsed: %2.3f\n', string(tn))
         
     end
     %A{i} = getframe(gcf).cdata; 
-    i = i+1;
-          
+    i = i+1;      
 end
 
 for j = 1:i-1
