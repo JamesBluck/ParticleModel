@@ -3,7 +3,7 @@ function [xnew ,vnew] = SimulationStep (dt,x,v,ball,box,g)
     global D  
 
     Forces = zeros(2,length(x));
-    CompletedPairs = zeros(length(x));
+    CompletedPairs = sparse(length(x),length(x));
 
 
     % Non-Optimised Simulation
@@ -40,7 +40,7 @@ function [xnew ,vnew] = SimulationStep (dt,x,v,ball,box,g)
     % Optimised Simulation
     if(D)        
         % Discretise Particles into Boxes
-        Grid = setupGrid(2*ball.radius,3,box,x);
+        Grid = setupGrid(4*ball.radius,3,box,x);
 
 
 
@@ -55,9 +55,9 @@ function [xnew ,vnew] = SimulationStep (dt,x,v,ball,box,g)
         end
         
 
-        populatedCells = find(~cellfun('isempty',Grid.data))';
+        populatedCells = sort(find(~cellfun('isempty',Grid.data)))';
         for i = populatedCells
-            [Forces,CompletedPairs] = processCell(ball,x,Forces,CompletedPairs,Grid, i);            
+            [Forces,CompletedPairs] = processCell(ball,x,Forces,CompletedPairs,Grid,i,populatedCells);            
         end
     end
 

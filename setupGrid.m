@@ -15,7 +15,6 @@ Grid.idx = Grid.Translation + floor(x./Grid.Width);
 cell_indices = round(sub2ind([Grid.cells_X, Grid.cells_Y], Grid.idx(1,:), Grid.idx(2,:)));
 particle_indices = (1:length(x))';
 % Grouping the particles associated with each cell
-Grid.data = accumarray(cell_indices(:), particle_indices, [], @(x) {x});
-       
+Grid.data = accumarray(cell_indices(:), particle_indices, [Grid.cells_X*Grid.cells_Y 1], @(x) {x});   
 end
 
